@@ -1,5 +1,5 @@
 // табы
-window.addEventListener('DOMContentLoaded', function () {
+window.addEventListener('DOMContentLoaded', () => {
 
     'use strict';
     let tab = document.querySelectorAll('.info-header-tab'),
@@ -21,7 +21,7 @@ window.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    info.addEventListener('click', function (event) {
+    info.addEventListener('click', (event) => {
         let target = event.target;
         if (target && target.classList.contains('info-header-tab')) {
             for (let i = 0; i < tab.length; i++) {
@@ -36,16 +36,13 @@ window.addEventListener('DOMContentLoaded', function () {
     });
 
     // таймер
-    let deadline = '2020-05-04';
+    let deadline = '2020-05-07';
 
     function getTimeRemaining(endtime) {
         let t = Date.parse(endtime) - Date.parse(new Date()),
             seconds = Math.floor((t / 1000) % 60),
             minutes = Math.floor((t / (1000 * 60)) % 60),
-            hours = Math.floor((t / (1000 * 60 * 60)));
-        if (hours > 12) {
-            hours = hours - 2;
-        }
+            hours = Math.floor((t / (1000 * 60 * 60))) - 3;
 
         return {
             "total": t,
@@ -64,28 +61,55 @@ window.addEventListener('DOMContentLoaded', function () {
 
         function updateClock() {
             let t = getTimeRemaining(endtime);
-            
-            if (t.hours < 10) {
-                hours.textContent = '0'+t.hours;
-            } else {
-                hours.textContent = t.hours;
+
+            function addZero(num) {
+                if (num <= 9) {
+                    return '0' + num;
+                } else {
+                    return num;
+                }
             }
-            if (t.minutes < 10) {
-                minutes.textContent = '0'+t.minutes;
-            } else {
-                minutes.textContent = t.minutes;
-            }
-            if (t.seconds < 10) {
-                seconds.textContent = '0'+t.seconds;
-            } else {
-                seconds.textContent = t.seconds;
-            }
+
+            hours.textContent = addZero(t.hours);
+            minutes.textContent = addZero(t.minutes);
+            seconds.textContent = addZero(t.seconds);
+
             if (t.total <= 0) {
                 clearInterval(timeInterval);
+                hours.textContent = '00';
+                minutes.textContent = '00';
+                seconds.textContent = '00';
             }
         }
-
-
     }
     setClock('timer', deadline);
+
+    // modal
+
+    let more = document.querySelector('.more'),
+        descrBtn = document.querySelectorAll('.description-btn'),
+        overlay = document.querySelector('.overlay'),
+        close = document.querySelector('.popup-close');
+
+
+    [].forEach.call(descrBtn, function (itclass) {
+        itclass.addEventListener('click', function () {
+            overlay.style.display = "block";
+            this.classList.add('more-splash');
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+    more.addEventListener('click', function () {
+        overlay.style.display = "block";
+        this.classList.add('more-splash');
+        document.body.style.overflow = 'hidden';
+
+    });
+
+    close.addEventListener('click', () => {
+        overlay.style.display = "none";
+        more.classList.remove('more-splash');
+        document.body.style.overflow = '';
+    });
 });
