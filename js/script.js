@@ -88,6 +88,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
     let more = document.querySelector('.more'),
         descrBtn = document.querySelectorAll('.description-btn'),
+        contBtn = document.getElementById('cont-btn'),
         overlay = document.querySelector('.overlay'),
         close = document.querySelector('.popup-close');
 
@@ -112,4 +113,62 @@ window.addEventListener('DOMContentLoaded', () => {
         more.classList.remove('more-splash');
         document.body.style.overflow = '';
     });
+
+    // form
+    let message = {
+        loading: 'Загрузка',
+        sucsess: 'Спасибо, скоро мы с вами свяжемся',
+        failure: 'Что-то пошло не так'
+    };
+
+    let form = document.querySelector('.main-form'),
+        input = form.getElementsByTagName('input'),
+        contactsForm = document.getElementById('form'),
+        contactsInput = contactsForm.getElementsByTagName('input'),
+        statusMessage = document.createElement('div');
+
+    statusMessage.classList.add('status');
+
+    function formSubmit(itform) {
+        itform.addEventListener('submit', function (event) {
+            event.preventDefault();
+            itform.appendChild(statusMessage);
+
+
+            let request = new XMLHttpRequest();
+            request.open('POST', 'server.php');
+            // В обычном формате:  request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            // в json формате:
+            request.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+
+            let formData = new FormData(form);
+            let obj = {};
+            formData.forEach(function (value, key) {
+                obj[key] = value;
+            });
+            let json = JSON.stringify(obj);
+            // В обычном формате:  request.send(formData);
+            request.send(json);
+
+            request.addEventListener('readystatechange', function () {
+                if (request.readyState < 4) {
+                    statusMessage.innerHTML = message.loading;
+                } else if (request.readyState === 4 && request.status == 200) {
+                    statusMessage.innerHTML = message.sucsess;
+                } else {
+                    statusMessage.innerHTML = message.failure;
+                }
+            });
+
+            for (let i = 0; i < input.length; i++) {
+                input[i].value = '';
+                
+            }
+            for (let j = 0; j < contactsInput.length; j++) {
+                contactsInput[j].value = '';
+            }
+        });
+    }
+    formSubmit(form);
+    formSubmit(contactsForm);
 });
